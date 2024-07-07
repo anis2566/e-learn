@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider} from '@clerk/nextjs'
+import NextTopLoader from 'nextjs-toploader';
 
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { ModalProvider } from "@/providers/modal-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +30,12 @@ export default function RootLayout({
             defaultTheme="dark"
             disableTransitionOnChange
           >
-            {children}
+            <QueryProvider>
+              {children}
+              <Toaster />
+              <NextTopLoader showSpinner={false} color="#156282" />
+              <ModalProvider />
+            </QueryProvider>
           </ThemeProvider>
         </body>
       </html>
