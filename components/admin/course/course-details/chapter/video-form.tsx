@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Upload } from "lucide-react";
 import { Chapter } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -14,12 +14,16 @@ import {
     FormControl,
     FormField,
     FormItem,
+    FormLabel,
     FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
 import { UploadDropzone } from "@/lib/uploadthing";
 import { UPDATE_CHAPTER } from "@/actions/chapter.action";
+import { GET_CREDENTIALS, UPLOAD_VIDEO } from "@/actions/video-cipher.action";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface ChapterVideoFormProps {
     initialData: Chapter;
@@ -28,7 +32,8 @@ interface ChapterVideoFormProps {
 };
 
 const formSchema = z.object({
-    videoUrl: z.string().min(1, {message: "required"}),
+    title: z.string().min(1, { message: "required" }),
+    file: z.instanceof(File, { message: "required" })
 });
 
 export const ChapterVideoForm = ({
@@ -42,35 +47,70 @@ export const ChapterVideoForm = ({
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: { videoUrl: initialData.videoUrl || "" },
+        defaultValues: {
+            title: "",
+            file: undefined
+        }
     });
 
-    const { mutate: updateChapter, isPending } = useMutation({
-        mutationFn: UPDATE_CHAPTER,
+    const { mutate: uploadVideo, isPending: isLoading } = useMutation({
+        mutationFn: UPLOAD_VIDEO,
         onSuccess: (data) => {
-            setIsEditing(false)
+            toggleEdit()
+            form.reset()
             toast.success(data?.success, {
-                id: "update-chapter"
-            });
+                id: "upload-video"
+            })
         },
         onError: (error) => {
             toast.error(error.message, {
-                id: "update-chapter"
+                id: "upload-video"
+            })
+        }
+    })
+
+    const { mutate: getCredentials, isPending } = useMutation({
+        mutationFn: GET_CREDENTIALS,
+        onSuccess: (data) => {
+            const formData = new FormData();
+            const payload = data?.payload;
+
+            if (payload) {
+                formData.append('policy', payload.policy);
+                formData.append('key', payload.key);
+                formData.append('x-amz-signature', payload['x-amz-signature']);
+                formData.append('x-amz-algorithm', payload['x-amz-algorithm']);
+                formData.append('x-amz-date', payload['x-amz-date']);
+                formData.append('x-amz-credential', payload['x-amz-credential']);
+                formData.append('uploadLink', payload.uploadLink);
+                formData.append('success_action_status', '201');
+                formData.append('success_action_redirect', '');
+                formData.append("videoId", data?.videoId)
+                formData.append("chapterId", chapterId)
+                formData.append("courseId", courseId)
+                formData.append("file", form.getValues("file"))
+
+                uploadVideo(formData)
+            }
+        },
+        onError: (error) => {
+            toast.error(error.message, {
+                id: "upload-video"
             });
         }
     })
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        toast.loading("Chapter updating...", {
-            id: "update-chapter"
+        toast.loading("Video uploading", {
+            id: "upload-video"
         })
-        updateChapter({ id: chapterId, courseId, values: { ...initialData, videoUrl: values.videoUrl } })
+        getCredentials(values.title)
     }
 
     return (
         <div className="mt-6 border bg-muted rounded-md p-4">
             <div className="font-medium flex items-center justify-between">
-                Chapter Video URL
+                Chapter Video
                 <Button onClick={toggleEdit} variant="ghost">
                     {isEditing ? (
                         <>Cancel</>
@@ -106,36 +146,37 @@ export const ChapterVideoForm = ({
                     >
                         <FormField
                             control={form.control}
-                            name="videoUrl"
+                            name="title"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Video title</FormLabel>
+                                    <FormControl>
+                                        <Input type="text" placeholder="Enter video title" {...field} disabled={isPending || isLoading} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="file"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormControl>
-                                        {
-                                            form.getValues("videoUrl") && !initialData.videoUrl ? (
-                                                <div className="relative aspect-video mt-2">
-                                                    <video
-                                                        src={form.getValues("videoUrl")}
-                                                        controls
-                                                    />
-                                                    <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0" onClick={() => form.setValue("videoUrl", "")}>
-                                                        <Trash2 className="w-5 h-5 text-rose-500" />
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <UploadDropzone
-                                                    endpoint="videoUploader"
-                                                    onClientUploadComplete={(res) => {
-                                                        // Do something with the response
-                                                        field.onChange(res[0].url)
-                                                        // toggleEdit()
-                                                        toast.success("Image uploaded")
-                                                    }}
-                                                    onUploadError={(error: Error) => {
-                                                        toast.error("Image upload failed")
-                                                    }}
-                                                />
-                                            )
-                                        }
+                                        <div className="grid w-full items-center gap-1.5">
+                                            <Label htmlFor="video">Video</Label>
+                                            <Input 
+                                                id="video" 
+                                                type="file" 
+                                                accept="video/*" 
+                                                onChange={(e) => {
+                                                    if (e.target.files && e.target.files[0]) {
+                                                        field.onChange(e.target.files[0]);
+                                                    }
+                                                }}
+                                                disabled={isPending || isLoading} 
+                                            />
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -143,7 +184,7 @@ export const ChapterVideoForm = ({
                         />
                         <div className="flex items-center gap-x-2">
                             <Button
-                                disabled={isPending}
+                                disabled={isPending || isLoading}
                                 type="submit"
                             >
                                 Save

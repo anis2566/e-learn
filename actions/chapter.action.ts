@@ -1,7 +1,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { Chapter } from "@prisma/client";
+import { getUser } from "@/services/user.service";
+import { Attachment, Chapter } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 type CreateChapter = {
@@ -57,116 +58,220 @@ export const REORDER_CHAPTER = async ({ list }: ReorderChapter) => {
   }
 };
 
-
 type UpdateChapter = {
-    id: string;
-    courseId: string;
-    values: Chapter;
-}
-export const UPDATE_CHAPTER = async ({id, values, courseId}:UpdateChapter) => {
-    const chapter = await db.chapter.findUnique({
-        where: {
-            id,
-            courseId
-        }
-    })
-    
-    if(!chapter) {
-        throw new Error("Chapter not found")
-    }
+  id: string;
+  courseId: string;
+  values: Chapter;
+};
+export const UPDATE_CHAPTER = async ({
+  id,
+  values,
+  courseId,
+}: UpdateChapter) => {
+  const chapter = await db.chapter.findUnique({
+    where: {
+      id,
+      courseId,
+    },
+  });
 
-    await db.chapter.update({
-        where: {
-            id,
-            courseId
-        },
-        data: {
-            ...values
-        }
-    })
+  if (!chapter) {
+    throw new Error("Chapter not found");
+  }
 
-    revalidatePath(`/admin/course/${courseId}/chapter/${id}`)
+  await db.chapter.update({
+    where: {
+      id,
+      courseId,
+    },
+    data: {
+      ...values,
+    },
+  });
 
-    return {
-        success: "Chapter updated"
-    }
-}
+  revalidatePath(`/admin/course/${courseId}/chapter/${id}`);
 
+  return {
+    success: "Chapter updated",
+  };
+};
 
-export const PUBLISH_CHAPTER = async (id:string) => {
-    const chapter = await db.chapter.findUnique({
-        where: {
-            id
-        }
-    })
+export const PUBLISH_CHAPTER = async (id: string) => {
+  const chapter = await db.chapter.findUnique({
+    where: {
+      id,
+    },
+  });
 
-    if(!chapter) {
-        throw new Error("Chapter not found")
-    }
+  if (!chapter) {
+    throw new Error("Chapter not found");
+  }
 
-    await db.chapter.update({
-        where: {
-            id
-        },
-        data: {
-            isPublished: true
-        }
-    })
+  await db.chapter.update({
+    where: {
+      id,
+    },
+    data: {
+      isPublished: true,
+    },
+  });
 
-    revalidatePath(`/admin/course/${chapter.courseId}/chapter/${id}`)
+  revalidatePath(`/admin/course/${chapter.courseId}/chapter/${id}`);
 
-    return {
-        success: "Chapter published"
-    }
-}
+  return {
+    success: "Chapter published",
+  };
+};
 
+export const UNPUBLISH_CHAPTER = async (id: string) => {
+  const chapter = await db.chapter.findUnique({
+    where: {
+      id,
+    },
+  });
 
-export const UNPUBLISH_CHAPTER = async (id:string) => {
-    const chapter = await db.chapter.findUnique({
-        where: {
-            id
-        }
-    })
+  if (!chapter) {
+    throw new Error("Chapter not found");
+  }
 
-    if(!chapter) {
-        throw new Error("Chapter not found")
-    }
+  await db.chapter.update({
+    where: {
+      id,
+    },
+    data: {
+      isPublished: false,
+    },
+  });
 
-    await db.chapter.update({
-        where: {
-            id
-        },
-        data: {
-            isPublished: false
-        }
-    })
+  revalidatePath(`/admin/course/${chapter.courseId}/chapter/${id}`);
 
-    revalidatePath(`/admin/course/${chapter.courseId}/chapter/${id}`)
-
-    return {
-        success: "Chapter published"
-    }
-}
-
+  return {
+    success: "Chapter published",
+  };
+};
 
 export const DELETE_CHAPTER = async (id: string) => {
-    const chapter = await db.chapter.findUnique({
-        where: {
-            id
-        }
-    })
+  const chapter = await db.chapter.findUnique({
+    where: {
+      id,
+    },
+  });
 
-    if(!chapter) {
-        throw new Error("Chapter not found")
+  if (!chapter) {
+    throw new Error("Chapter not found");
+  }
+
+  await db.chapter.delete({
+    where: {
+      id,
+    },
+  });
+
+  return {
+    success: "Chapter deleted",
+  };
+};
+
+type GetChapter = {
+  courseId: string;
+  chapterId: string;
+};
+export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
+  const { userId } = await getUser();
+
+  try {
+    const purchased = await db.purchase.findUnique({
+      where: {
+        userId_courseId: {
+          userId,
+          courseId,
+        },
+      },
+    });
+
+    const course = await db.course.findUnique({
+      where: {
+        id: courseId,
+        isPublished: true,
+      },
+    });
+
+    const chapter = await db.chapter.findUnique({
+      where: {
+        id: chapterId,
+        isPublished: true,
+      },
+    });
+
+    if (!chapter || !course) {
+      throw new Error("Chapter or course not found");
     }
 
-    await db.chapter.delete({
+    let previousChapter = null;
+
+    if (chapter.position !== null) {
+      const pre = await db.chapter.findFirst({
         where: {
-            id
+          courseId,
+          position: chapter.position - 1,
         },
-    })
+      });
+      if (pre) {
+        previousChapter = pre.id;
+      }
+    }
+
+    let nextChapter = null;
+    if (chapter.position !== null) {
+      const nex = await db.chapter.findFirst({
+        where: {
+          courseId,
+          position: chapter.position + 1,
+        },
+      });
+
+      if (nex) {
+        nextChapter = nex.id;
+      }
+    }
+
+    let attachments: Attachment[] = [];
+    // let nextChapter: Chapter | null = null;
+
+    if (purchased) {
+      attachments = await db.attachment.findMany({
+        where: {
+          chapterId: chapterId,
+        },
+      });
+    }
+
+    const userProgress = await db.userProgress.findUnique({
+      where: {
+        userId_chapterId: {
+          userId,
+          chapterId,
+        },
+      },
+    });
 
     return {
-        success: "Chapter deleted"
-    }
-}
+      chapter,
+      course,
+      attachments,
+      previousChapter,
+      nextChapter,
+      userProgress,
+      purchased,
+    };
+  } catch (error) {
+    return {
+      chapter: null,
+      course: null,
+      attachments: [],
+      nextChapter: null,
+      userProgress: null,
+      purchase: null,
+    };
+  }
+};

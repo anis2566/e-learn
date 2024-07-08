@@ -6,6 +6,7 @@ import queryString from "query-string"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 
 import { GET_CATEGORIES } from "@/actions/category.action"
 import { cn } from "@/lib/utils"
@@ -16,7 +17,7 @@ export const BrowseCategory = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    const { data: categories } = useQuery({
+    const { data: categories, isLoading } = useQuery({
         queryKey: ["category-for-browse"],
         queryFn: async () => {
             const res = await GET_CATEGORIES()
@@ -39,6 +40,8 @@ export const BrowseCategory = () => {
         }
     }
 
+    if(isLoading) return <CategorySkeleton />
+
     return (
         <div className="flex items-center gap-x-3">
             {
@@ -48,7 +51,7 @@ export const BrowseCategory = () => {
                         <Badge
                             key={category.id}
                             className={cn(
-                                "flex items-center gap-x-2 p-2 cursor-pointer border-primary",
+                                "flex h-10 items-center gap-x-2 p-2 cursor-pointer border-primary",
                             )}
                             variant={active ? "default" : "outline"}
                             onClick={() => handleClick(category.name)}
@@ -64,6 +67,18 @@ export const BrowseCategory = () => {
                         </Badge>
                     )
                 })
+            }
+        </div>
+    )
+}
+
+const CategorySkeleton = () => {
+    return (
+        <div className="flex items-center gap-x-3">
+            {
+                Array.from({length: 4}).map((_, index) => (
+                    <Skeleton key={index} className="h-10 w-24 rounded-full flex items-center gap-x-2 p-2 cursor-pointer border-primary" />
+                ))
             }
         </div>
     )

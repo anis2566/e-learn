@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import {
     Breadcrumb,
@@ -14,13 +15,23 @@ import { BrowseCategory } from "@/components/dashboard/browse/category";
 import { db } from "@/lib/db";
 import { CourseCard } from "@/components/dashboard/card/course-card";
 
+export const metadata: Metadata = {
+    title: "E-Learn | Browse",
+    description: "E-learning Web Application",
+};
+
+
 const BrowseCourse = async () => {
     const courses = await db.course.findMany({
+        where: {
+            isPublished: true
+        },
         include: {
             category: true,
             chapters: true
         }
     })
+    
     return (
         <ContentLayout title="Browse">
             <Breadcrumb>
