@@ -1,6 +1,10 @@
-import { redirect } from "next/navigation";
+"use client"
 
-import { db } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+
+import { GET_COURSE } from "@/actions/course.action";
 
 interface Props {
     params: {
@@ -8,19 +12,26 @@ interface Props {
     }
 }
 
-const Course = async ({ params: { id } }: Props) => {
-    const course = await db.course.findUnique({
-        where: {
-            id
+const Course = ({ params: { id } }: Props) => {
+
+    const {data: course, isLoading} = useQuery({
+        queryKey: ["get-course", id],
+        queryFn: async () => {
+            const res = await GET_COURSE(id)
+            return res.course
         },
-        include: {
-            chapters: true
-        }
+        enabled: !!id
     })
 
-    if (!course) redirect("/admin")
+    if(isLoading) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center">
+                <Loader2 className="w-5 h-5 animate-spin" />
+            </div>
+        )
+    }
 
-    return redirect(`/dashboard/courses/${course.id}/chapters/${course.chapters[0].id}`);
+    return redirect(`/dashboard/courses/${course?.id}/chapters/${course?.chapters[0].id}`);
 }
 
 export default Course

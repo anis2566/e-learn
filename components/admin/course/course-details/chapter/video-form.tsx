@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Pencil, Trash2, Upload } from "lucide-react";
+import { Pencil} from "lucide-react";
 import { Chapter } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -18,12 +18,10 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-
-import { UploadDropzone } from "@/lib/uploadthing";
-import { UPDATE_CHAPTER } from "@/actions/chapter.action";
-import { GET_CREDENTIALS, UPLOAD_VIDEO } from "@/actions/video-cipher.action";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+
+import { GET_CREDENTIALS, UPLOAD_VIDEO } from "@/actions/video-cipher.action";
 
 interface ChapterVideoFormProps {
     initialData: Chapter;

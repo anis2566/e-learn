@@ -56,3 +56,19 @@ export const DELETE_ATTACHMENT = async (id: string) => {
         success: "Attachment deleted"
     }
 }
+
+
+export const GET_ATTACHMENTS = async (chapterId: string) => {
+    const attachments = await db.attachment.findMany({
+        where: {
+            chapterId
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
+    })
+
+    return {
+        attachments
+    }
+}

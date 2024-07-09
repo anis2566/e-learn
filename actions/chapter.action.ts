@@ -194,6 +194,13 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
         id: courseId,
         isPublished: true,
       },
+      include: {
+        chapters: {
+          select: {
+            id: true
+          }
+        },
+      }
     });
 
     const chapter = await db.chapter.findUnique({
@@ -201,6 +208,18 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
         id: chapterId,
         isPublished: true,
       },
+      include: {
+        questions: {
+          select: {
+            id: true
+          }
+        },
+        attachments: {
+          select: {
+            id: true
+          }
+        }
+      }
     });
 
     if (!chapter || !course) {
@@ -236,7 +255,6 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
     }
 
     let attachments: Attachment[] = [];
-    // let nextChapter: Chapter | null = null;
 
     if (purchased) {
       attachments = await db.attachment.findMany({

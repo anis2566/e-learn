@@ -1,41 +1,36 @@
-import { db } from "@/lib/db"
-import { getUser } from "@/services/user.service"
-import { Chapter, Course } from "@prisma/client";
+import { Chapter, Course, UserProgress } from "@prisma/client";
+
 import { CourseSidebarItem } from "./course-sidebar-item";
+import { CourseProgress } from "./course-progress";
+
+interface ChapterWithProgress extends Chapter {
+    userProgress: UserProgress[]
+}
 
 interface CourseWithCahpter extends Course {
-    chapters: Chapter[]
+    chapters: ChapterWithProgress[];
 }
 
 interface Props {
     course: CourseWithCahpter;
+    progressCount: number;
+    purchased: boolean;
 }
 
-export const CourseSidebar = async ({ course }: Props) => {
-    const { userId } = await getUser()
-
-    const purchased = await db.purchase.findUnique({
-        where: {
-            userId_courseId: {
-                userId,
-                courseId: course.id
-            }
-        }
-    })
-
+export const CourseSidebar = ({ course, progressCount, purchased }: Props) => {
 
     return (
-        <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
+        <div className="hidden md:flex h-full border-r flex-col overflow-y-auto shadow-sm">
             <div className="px-8 py-4 flex flex-col border-b">
                 <h1 className="font-semibold">
                     {course.title}
                 </h1>
                 {purchased && (
                     <div className="mt-10">
-                        {/* <CourseProgress
+                        <CourseProgress
                             variant="success"
                             value={progressCount}
-                        /> */}
+                        />
                     </div>
                 )}
             </div>
@@ -45,8 +40,7 @@ export const CourseSidebar = async ({ course }: Props) => {
                         key={chapter.id}
                         id={chapter.id}
                         label={chapter.title}
-                        // isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
-                        isCompleted={false}
+                        isCompleted={!!chapter?.userProgress?.[0]?.isCompleted}
                         courseId={course.id}
                         isLocked={!chapter.isFree && !purchased}
                     />

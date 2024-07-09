@@ -8,7 +8,7 @@ export const GET_CREDENTIALS = async (title: string) => {
     const res = await fetch(`https://dev.vdocipher.com/api/videos?title=${title}`, {
         method: "PUT",
         headers: {
-            "Authorization": "Apisecret 9n3WhfUjIZX44cEHLdBmW1kLwzoM7RxKWWkqk8D019ViEOPDyUXWpBSNxwvwU3C0"
+            "Authorization": `Apisecret ${process.env.VIDEO_CIPHER_API_KEY}`
         }
     });
 
@@ -61,3 +61,28 @@ export const UPLOAD_VIDEO = async (formData: FormData) => {
         throw new Error("Faild to upload video")
     }
 }
+
+
+export const GENERATE_PLAYER = async (videoId: string) => {
+  try {
+    const res = await axios.post(
+      `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+      {
+        ttl: 300,
+      },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Apisecret ${process.env.VIDEO_CIPHER_API_KEY}`,
+        },
+      }
+    );
+    return {
+      otp: res.data?.otp,
+      playbackInfo: res.data?.playbackInfo
+    };
+  } catch (error) {
+      throw new Error("Something went wrong")
+  }
+};
