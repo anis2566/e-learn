@@ -27,6 +27,30 @@ export const CREATE_COURSE = async (title: string) => {
   };
 };
 
+type GetCourses = {
+  search: string | null;
+  sort: string | null;
+  category: string | null;
+};
+export const GET_COURSES = async ({ search, sort, category }: GetCourses) => {
+  const courses = await db.course.findMany({
+    where: {
+      isPublished: true,
+      ...(search && { title: { contains: search, mode: "insensitive" } }),
+      ...(category && { category: { name: category } }),
+    },
+    include: {
+      category: true,
+      chapters: true,
+    },
+    orderBy: {
+      ...(sort && {createdAt: sort === "asc" ? "asc" : "desc"})
+    },
+  });
+
+  return {courses}
+};
+
 export const GET_COURSE = async (id: string) => {
   const course = await db.course.findUnique({
     where: {
@@ -35,17 +59,17 @@ export const GET_COURSE = async (id: string) => {
     include: {
       chapters: {
         orderBy: {
-          position: "asc"
-        }
+          position: "asc",
+        },
       },
     },
   });
 
-  if(!course) redirect("/dashboard")
+  if (!course) redirect("/dashboard");
 
   return {
-    course
-  }
+    course,
+  };
 };
 
 type UpdateCourse = {

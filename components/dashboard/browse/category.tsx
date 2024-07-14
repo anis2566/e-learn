@@ -43,7 +43,7 @@ export const BrowseCategory = () => {
     if(isLoading) return <CategorySkeleton />
 
     return (
-        <div className="flex items-center gap-x-3">
+        <div className="flex-1 flex items-center gap-x-3">
             {
                 categories?.map(category => {
                     const active = searchParams.get("category") === category.name

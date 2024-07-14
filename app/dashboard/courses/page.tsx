@@ -11,20 +11,11 @@ import {
 
 import { ContentLayout } from "@/components/dashboard/content-layout"
 import { BrowseCategory } from "@/components/dashboard/browse/category";
-import { CourseCard } from "@/components/dashboard/card/course-card";
-import { db } from "@/lib/db";
+import { Search } from "@/components/dashboard/course/search";
+import { Sort } from "@/components/dashboard/course/sort";
+import { CourseList } from "@/components/dashboard/course/course-list";
 
-const Courses = async () => {
-    const courses = await db.course.findMany({
-        where: {
-            isPublished: true
-        },
-        include: {
-            category: true,
-            chapters: true
-        }
-    })
-
+const Courses = () => {
     return (
         <ContentLayout title="Browse">
             <Breadcrumb>
@@ -41,15 +32,13 @@ const Courses = async () => {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="space-y-6 mt-4">
-                <BrowseCategory />
-                <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
-                    {
-                        courses.map(course => (
-                            <CourseCard key={course.id} course={course} />
-                        ))
-                    }
+            <div className="space-y-8 mt-4">
+                <Search />
+                <div className="flex justify-between items-center">
+                    <BrowseCategory />
+                    <Sort />
                 </div>
+                <CourseList />
             </div>
         </ContentLayout>
     )

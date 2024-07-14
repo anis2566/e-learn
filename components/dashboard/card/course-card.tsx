@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/utils";
 import { CourseProgress } from "../course/course-progress";
 import { Category, Chapter, Course } from "@prisma/client";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseWithFeatures extends Course {
     category: Category | null;
@@ -61,5 +62,22 @@ export const CourseCard = ({ course }: Props) => {
                 </div>
             </div>
         </Link>
+    )
+}
+
+
+export const CourseCardSkeleton = () => {
+    return (
+        <div className="group hover:shadow-sm transition overflow-hidden border rounded-lg p-3">
+            <div className="relative w-full aspect-video rounded-md overflow-hidden">
+                <Skeleton className="object-cover w-full h-full" />
+            </div>
+            <div className="flex flex-col pt-2 gap-y-1">
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-1/3 h-6 rounded-full" />
+                <Skeleton className="w-1/3 h-6 rounded-full" />
+                <Skeleton className="w-1/3 h-6 rounded-full" />
+            </div>
+        </div>
     )
 }
