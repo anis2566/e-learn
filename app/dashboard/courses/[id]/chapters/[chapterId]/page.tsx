@@ -34,7 +34,7 @@ const Chapter = ({ params: { id, chapterId } }: Props) => {
         }
     })
 
-    const isLocked = !data?.chapter?.isFree && !data?.purchase;
+    const isLocked = !data?.chapter?.isFree && !data?.purchased;
     const isCompleted = data?.purchased && data?.userProgress?.isCompleted
     const purchased = !!data?.purchased ?? false
 
@@ -70,6 +70,7 @@ const Chapter = ({ params: { id, chapterId } }: Props) => {
                                 isLocked={isLocked}
                                 isCompleted={isCompleted ?? false}
                                 purchased={purchased}
+                                course={data?.course ?? null}
                             />
                         </div>
                     )

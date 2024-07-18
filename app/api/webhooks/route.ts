@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { Knock } from "@knocklabs/node";
+import { Role } from "@prisma/client";
 const knock = new Knock(process.env.NEXT_PUBLIC_KNOCK_API_KEY);
 
 export async function POST(req: Request) {
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
         email: evt.data.email_addresses[0].email_address,
         name: `${evt.data.first_name} ${evt.data.last_name}`,
         imageUrl: evt.data.image_url,
+        role: evt.data.public_metadata?.role as Role || Role.User
       },
     });
   }

@@ -17,10 +17,9 @@ interface Props {
     courseId: string;
     chapterId: string;
     isCompleted: boolean;
-    purchased: boolean;
 }
 
-export const VideoController = ({ nextChapterId, courseId, previousChapterId, chapterId, isCompleted, purchased }: Props) => {
+export const VideoController = ({ nextChapterId, courseId, previousChapterId, chapterId, isCompleted}: Props) => {
 
     const {onOpen} = useConfettiStore()
     const queryClient = useQueryClient()
@@ -82,7 +81,7 @@ export const VideoController = ({ nextChapterId, courseId, previousChapterId, ch
 
     return (
         <div className="space-y-4 w-full">
-            <Button variant="outline" onClick={hanldeComplete} disabled={isPending || isLoading} className={cn("hidden", purchased && "flex" )}>
+            <Button variant="outline" onClick={hanldeComplete} disabled={isPending || isLoading}>
                 {isCompleted ? "Mark as Incomplete" : "Mark as Complete"}
             </Button>
             <div className="flex justify-between items-center">

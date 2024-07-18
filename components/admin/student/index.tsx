@@ -23,7 +23,7 @@ import {
 import { Empty } from "@/components/empty";
 
 interface StudentWithFeature extends User {
-    courses: { id: string }[]
+    purchases: { id: string }[]
 }
 
 interface Props {
@@ -59,7 +59,7 @@ export const StudentList = ({ students }: Props) => {
                                         </TableCell>
                                         <TableCell className="px-2 py-2">{student.name}</TableCell>
                                         <TableCell className="px-2 py-2">{student.email}</TableCell>
-                                        <TableCell className="px-2 py-2">{student.courses?.length}</TableCell>
+                                        <TableCell className="px-2 py-2">{student.purchases?.length}</TableCell>
                                         <TableCell className="px-2 py-2">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

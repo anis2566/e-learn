@@ -1,4 +1,5 @@
 import AdminPanelLayout from "@/components/admin/layout";
+import { AppKnockProviders } from "@/providers/knock-provider";
 
 export default function DemoLayout({
   children
@@ -6,6 +7,8 @@ export default function DemoLayout({
   children: React.ReactNode;
 }) {
   return (
+    <AppKnockProviders>
       <AdminPanelLayout>{children}</AdminPanelLayout>
+    </AppKnockProviders>
   )
 }

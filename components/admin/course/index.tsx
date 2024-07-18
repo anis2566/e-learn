@@ -28,7 +28,8 @@ import { useCourse } from "@/hooks/use-course"
 
 interface CourseWithFeatures extends Course {
     category: Category | null;
-    chapters: { id: string }[]
+    chapters: { id: string }[];
+    purchases: {id: string}[]
 }
 
 interface Props {
@@ -52,6 +53,7 @@ export const CourseList = ({ courses }: Props) => {
                                 <TableHead className="px-2">Category</TableHead>
                                 <TableHead className="px-2">Chapters</TableHead>
                                 <TableHead className="px-2">Price</TableHead>
+                                <TableHead className="px-2">Sell</TableHead>
                                 <TableHead className="px-2">Publish</TableHead>
                                 <TableHead className="px-2">Action</TableHead>
                             </TableRow>
@@ -67,9 +69,12 @@ export const CourseList = ({ courses }: Props) => {
                                             </Avatar>
                                         </TableCell>
                                         <TableCell className="px-2 py-2">{course.title}</TableCell>
-                                        <TableCell className="px-2 py-2">{course.category?.name}</TableCell>
+                                        <TableCell className="px-2 py-2">
+                                            <Badge>{course.category?.name}</Badge>
+                                        </TableCell>
                                         <TableCell className="px-2 py-2">{course.chapters?.length}</TableCell>
                                         <TableCell className="px-2 py-2">&#2547;{course.price}</TableCell>
+                                        <TableCell className="px-2 py-2">{course.purchases.length}</TableCell>
                                         <TableCell className="px-2 py-2">
                                             <Badge
                                                 className={cn(

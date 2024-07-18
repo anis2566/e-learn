@@ -11,11 +11,11 @@ import {
 
 import { ContentLayout } from "@/components/dashboard/content-layout"
 import { Search } from "@/components/dashboard/course/search";
-import { CourseList } from "@/components/dashboard/course/course-list";
+import { CourseList } from "@/components/dashboard/my-courses/course-list";
 
-const Courses = () => {
+const MyCourses = () => {
     return (
-        <ContentLayout title="Browse">
+        <ContentLayout title="My Courses">
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -25,12 +25,12 @@ const Courses = () => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Courses</BreadcrumbPage>
+                        <BreadcrumbPage>My Courses</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className="space-y-8 mt-4">
+            <div className="space-y-8 mt-8">
                 <Search />
                 <CourseList />
             </div>
@@ -38,4 +38,4 @@ const Courses = () => {
     )
 }
 
-export default Courses;
+export default MyCourses;

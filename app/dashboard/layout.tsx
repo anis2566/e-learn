@@ -1,4 +1,5 @@
 import DashboardLayout from "@/components/dashboard/layout";
+import { AppKnockProviders } from "@/providers/knock-provider";
 
 export default function DemoLayout({
   children
@@ -6,6 +7,8 @@ export default function DemoLayout({
   children: React.ReactNode;
 }) {
   return (
+    <AppKnockProviders>
       <DashboardLayout>{children}</DashboardLayout>
+    </AppKnockProviders>
   )
 }

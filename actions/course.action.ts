@@ -4,6 +4,8 @@ import { db } from "@/lib/db";
 import { Course } from "@prisma/client";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import { GET_PROGRESS } from "./user-progress.action";
+import { getUser } from "@/services/user.service";
 
 export const CREATE_COURSE = async (title: string) => {
   const course = await db.course.findFirst({
@@ -42,13 +44,60 @@ export const GET_COURSES = async ({ search, sort, category }: GetCourses) => {
     include: {
       category: true,
       chapters: true,
+      purchases: true,
     },
     orderBy: {
-      ...(sort && {createdAt: sort === "asc" ? "asc" : "desc"})
+      ...(sort && { createdAt: sort === "asc" ? "asc" : "desc" }),
     },
   });
 
-  return {courses}
+  return { courses };
+};
+
+
+export const GET_MY_COURSES = async ({ search, sort, category }: GetCourses) => {
+  const {userId} = await getUser()
+
+  const courses = await db.course.findMany({
+    where: {
+      purchases: {
+        some: {
+          userId
+        }
+      },
+      isPublished: true,
+      ...(search && { title: { contains: search, mode: "insensitive" } }),
+      ...(category && { category: { name: category } }),
+    },
+    include: {
+      category: true,
+      chapters: true,
+      purchases: true,
+    },
+    orderBy: {
+      ...(sort && { createdAt: sort === "asc" ? "asc" : "desc" }),
+    },
+  });
+
+  const coursesWithProgress = await Promise.all(
+    courses.map(async (course) => {
+      if (course.purchases.length === 0) {
+        return {
+          ...course,
+          progress: null,
+        };
+      }
+
+      const progressPercentage = await GET_PROGRESS(userId, course.id);
+
+      return {
+        ...course,
+        progress: progressPercentage,
+      };
+    })
+  );
+
+  return { courses: coursesWithProgress };
 };
 
 export const GET_COURSE = async (id: string) => {

@@ -42,11 +42,11 @@ const Student = async ({searchParams}:Props) => {
             ...(search && { name: { contains: search, mode: "insensitive" } })
         },
         include: {
-            courses: {
+            purchases: { 
                 select: {
                     id: true
                 }
-            }
+            },
         },
         orderBy: {
             createdAt: sort === "asc" ? "asc" : "desc"
@@ -62,6 +62,8 @@ const Student = async ({searchParams}:Props) => {
     })
 
     const totalPage = Math.ceil(totalStudent / itemsPerPage)
+
+    console.log(students)
 
     return (
         <ContentLayout title="Student">

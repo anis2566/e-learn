@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { getUser } from "@/services/user.service";
+import { revalidatePath } from "next/cache";
 
 type ToggleProgress = {
   courseId: string;
@@ -42,6 +43,8 @@ export const MARK_COMPLETE = async ({
     },
   });
 
+  revalidatePath(`/dashboard/courses/${chapter.courseId}/chapters/${chapter.id}`)
+
   return {
     success: "Chapter completed",
   };
@@ -77,6 +80,8 @@ export const MARK_INCOMPLETE = async ({
       isCompleted: false,
     },
   });
+
+  revalidatePath(`/dashboard/courses/${chapter.courseId}/chapters/${chapter.id}`)
 
   return {
     success: "Chapter incompleted",

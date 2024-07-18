@@ -34,7 +34,7 @@ export default function RootLayout({
             <QueryProvider>
               {children}
               <Toaster />
-              <NextTopLoader showSpinner={false} color="#156282" />
+              <NextTopLoader showSpinner={false} color="red" />
               <ConfettiProvider />
               <ModalProvider />
             </QueryProvider>

@@ -135,14 +135,14 @@ import {
           {
             href: "/dashboard/courses",
             label: "Browse",
-            active: pathname === "/dashboard/search",
+            active: pathname === "/dashboard/courses",
             icon: Compass,
             submenus: [],
           },
           {
             href: "/dashboard/my-courses",
             label: "My Courses",
-            active: pathname === "/dashboard/courses",
+            active: pathname === "/dashboard/my-courses",
             icon: BookOpen,
             submenus: [],
           },

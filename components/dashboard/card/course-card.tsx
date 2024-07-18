@@ -1,17 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
+import { Category, Chapter, Course } from "@prisma/client";
 
+import { Badge } from "@/components/ui/badge";
+
+import { CourseProgress } from "../course/course-progress";
 import { IconBadge } from "@/components/admin/course/course-details/icon-badge";
 import { formatPrice } from "@/lib/utils";
-import { CourseProgress } from "../course/course-progress";
-import { Category, Chapter, Course } from "@prisma/client";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseWithFeatures extends Course {
     category: Category | null;
-    chapters: Chapter[]
+    chapters: Chapter[];
+    progress?: number | null;
 }
 
 interface Props {
@@ -19,6 +21,7 @@ interface Props {
 }
 
 export const CourseCard = ({ course }: Props) => {
+    console.log(course)
     return (
         <Link href={`/dashboard/courses/${course.id}`}>
             <div className="group hover:shadow-sm transition overflow-hidden border rounded-lg p-3 h-full">
@@ -45,20 +48,17 @@ export const CourseCard = ({ course }: Props) => {
                             </span>
                         </div>
                     </div>
-                    {/* {progress !== null ? (
-            <CourseProgress
-              variant={progress === 100 ? "success" : "default"}
-              size="sm"
-              value={progress}
-            />
-          ) : (
-            <p className="text-md md:text-sm font-medium text-slate-700">
-              {formatPrice(price)}
-            </p>
-          )} */}
-                    <p className="text-md md:text-sm font-medium">
-                        {formatPrice(course.price ?? 0)}
-                    </p>
+                    {course.progress && course.progress !== null ? (
+                        <CourseProgress
+                            variant={course.progress === 100 ? "success" : "default"}
+                            size="sm"
+                            value={course.progress}
+                        />
+                    ) : (
+                        <p className="text-md md:text-sm font-medium text-slate-700">
+                            {formatPrice(course.price ?? 0)}
+                        </p>
+                    )}
                 </div>
             </div>
         </Link>

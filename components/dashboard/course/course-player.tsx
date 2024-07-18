@@ -1,9 +1,12 @@
 "use client";
 
 import { Loader2, Lock } from "lucide-react";
+import { Course } from "@prisma/client";
 
 import { VideoPlayer } from "@/components/video-player";
 import { VideoController } from "@/components/video-controller";
+import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
 
 interface CoursePlayerProps {
     videoId: string;
@@ -14,6 +17,7 @@ interface CoursePlayerProps {
     isLocked: boolean;
     isCompleted: boolean;
     purchased: boolean;
+    course: Course | null;
 };
 
 export const CoursePlayer = ({
@@ -24,7 +28,8 @@ export const CoursePlayer = ({
     previousChapterId,
     isLocked,
     isCompleted,
-    purchased
+    purchased,
+    course
 }: CoursePlayerProps) => {
 
     return (
@@ -47,7 +52,16 @@ export const CoursePlayer = ({
                     <VideoPlayer videoId={videoId} />
                 )}
             </div>
-            <VideoController purchased={purchased} isCompleted={isCompleted} nextChapterId={nextChapterId || ""} previousChapterId={previousChapterId || ""} courseId={courseId} chapterId={chapterId} />
+            {!purchased && (
+                <div className="flex justify-end">
+                    <Button>Enroll with {formatPrice(course?.price ?? 0)}</Button>
+                </div>
+            )}
+            {
+                purchased && (
+                    <VideoController isCompleted={isCompleted} nextChapterId={nextChapterId || ""} previousChapterId={previousChapterId || ""} courseId={courseId} chapterId={chapterId} />
+                )
+            }
         </div>
     )
 }

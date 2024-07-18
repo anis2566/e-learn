@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import queryString from "query-string";
 import { useState } from "react";
 
@@ -16,6 +16,7 @@ export function Search() {
     const [search, setSearch] = useState<string>("")
 
     const router = useRouter()
+    const pathname = usePathname()
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value)
@@ -24,7 +25,7 @@ export function Search() {
         e.preventDefault();
 
         const url = queryString.stringifyUrl({
-            url: "/dashboard/courses",
+            url: pathname,
             query: {
                 search: search
             }

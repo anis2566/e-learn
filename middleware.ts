@@ -2,12 +2,14 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isProtectedRoute = createRouteMatcher([
   "/dashboard",
+  "/teacher(.*)"
 ]);
 
 
 export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) {
-    // const role = auth().sessionClaims?.role as string;
+    const role = auth().sessionClaims?.role as string;
+    console.log(role)
     // const isScout = role?.split(" ")?.includes("Scout")
     if (!auth().userId) {
       auth().protect(); 

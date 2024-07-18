@@ -47,7 +47,12 @@ const Courses = async ({searchParams}:Props) => {
                 select: {
                     id: true
                 }
-            }
+            },
+            purchases: {
+                select: {
+                    id: true
+                }
+            },
         },
         orderBy: {
             createdAt: sort === "asc" ? "asc" : "desc"

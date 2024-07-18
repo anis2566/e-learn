@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   Admin
   User
+  Teacher
 }
 
 
@@ -27,13 +28,35 @@ model User {
   imageUrl String
   role Role @default(User)
 
-  courses Course[]
   questions Question[]
+  purchases Purchase[]
+  teacher Teacher?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
   @@index([id, clerkId])
+}
+
+model Teacher {
+  id String @id @default(uuid())
+
+  name String
+  email String
+  phone String
+  imageUrl String
+  bio String @db.Text
+  experience Int? 
+
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  courses CourseTeacher[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id, userId])
 }
 
 model Category {
@@ -49,6 +72,16 @@ model Category {
   updatedAt DateTime @updatedAt
 }
 
+model CourseTeacher {
+  teacherId String
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  courseId String
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([teacherId, courseId])
+}
+
 model Course {
   id String @id @default(uuid())
   title String @db.Text
@@ -61,17 +94,15 @@ model Course {
   categoryId String?
   category Category? @relation(fields: [categoryId], references: [id])
 
-  userId String?
-  user User? @relation(fields: [userId], references: [id])
-
   chapters Chapter[]
   purchases Purchase[]
   questions Question[]
+  teachers CourseTeacher[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([id, categoryId, userId])
+  @@index([id, categoryId])
 }
 
 model Chapter {
@@ -132,10 +163,12 @@ model UserProgress {
 
 model Purchase {
   id String @id @default(uuid())
-  userId String
 
   courseId String
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
