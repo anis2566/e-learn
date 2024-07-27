@@ -54,16 +54,19 @@ export const GET_COURSES = async ({ search, sort, category }: GetCourses) => {
   return { courses };
 };
 
-
-export const GET_MY_COURSES = async ({ search, sort, category }: GetCourses) => {
-  const {userId} = await getUser()
+export const GET_MY_COURSES = async ({
+  search,
+  sort,
+  category,
+}: GetCourses) => {
+  const { userId } = await getUser();
 
   const courses = await db.course.findMany({
     where: {
       purchases: {
         some: {
-          userId
-        }
+          userId,
+        },
       },
       isPublished: true,
       ...(search && { title: { contains: search, mode: "insensitive" } }),
@@ -145,6 +148,87 @@ export const UPDATE_COURSE = async ({ id, values }: UpdateCourse) => {
   });
 
   revalidatePath(`/admin/course/${id}`);
+
+  return {
+    success: "Course updated",
+  };
+};
+
+type AssignTeacher = {
+  courseId: string;
+  teachers: string[];
+};
+export const ASSIGN_TEACHER = async ({ courseId, teachers }: AssignTeacher) => {
+  const course = await db.course.findUnique({
+    where: {
+      id: courseId,
+    },
+  });
+  if (!course) {
+    throw new Error("Course not found");
+  }
+
+  const existingTeachers = await db.courseTeacher.findMany({
+    where: {
+      courseId,
+      teacherId: {
+        in: teachers,
+      },
+    },
+  });
+
+  if (existingTeachers.length > 0) {
+    throw new Error("Teacher already exists");
+  }
+
+  await Promise.all(
+    teachers.map((teacherId) =>
+      db.courseTeacher.create({
+        data: {
+          courseId: courseId,
+          teacherId: teacherId,
+        },
+      })
+    )
+  );
+
+  revalidatePath(`/admin/course/${courseId}`);
+
+  return {
+    success: "Course updated",
+  };
+};
+
+type RemoveTeacher = {
+  courseId: string;
+  teacherId: string;
+};
+export const REMOVE_TEACHER = async ({
+  courseId,
+  teacherId,
+}: RemoveTeacher) => {
+  const courseTeacher = await db.courseTeacher.findUnique({
+    where: {
+      teacherId_courseId: {
+        teacherId,
+        courseId,
+      },
+    },
+  });
+  if (!courseTeacher) {
+    throw new Error("Course or Teacher not found");
+  }
+
+  await db.courseTeacher.delete({
+    where: {
+      teacherId_courseId: {
+        teacherId,
+        courseId,
+      },
+    },
+  });
+
+  revalidatePath(`/admin/course/${courseId}`);
 
   return {
     success: "Course updated",

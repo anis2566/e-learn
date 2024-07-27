@@ -1,6 +1,10 @@
-const TeacherDashboard = () => {
+import { ContentLayout } from "./_components/layout/content-layout"
+
+const TeacherDashboard = () => { 
     return (
-        <div>Teacher</div>
+        <ContentLayout title="Dashboard">
+            <div>Teacher</div>
+        </ContentLayout>
     )
 }
 

@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { GET_QUESTIONS } from "@/actions/question.action";
 import { cn } from "@/lib/utils";
+import { useQuestionReply } from "@/hooks/use-question";
 
 interface Props {
     courseId: string;
@@ -19,8 +20,11 @@ interface Props {
 
 export const Questions = ({ chapterId, courseId }: Props) => {
     const [page, setPage] = useState<number>(1)
+
+    const {onOpen} = useQuestionReply()
+
     const { data: questions, isLoading } = useQuery({
-        queryKey: ["chpater-questions", courseId, chapterId, page],
+        queryKey: ["chpater-questions-for-teacher", courseId, chapterId, page],
         queryFn: async () => {
             const res = await GET_QUESTIONS({ chapterId, courseId, page })
             return res.questions
@@ -50,6 +54,7 @@ export const Questions = ({ chapterId, courseId }: Props) => {
                                     {question.title}
                                 </p>
                             </div>
+                            <Button onClick={() => onOpen(question.id)}>Reply</Button>
                         </div>
                         {
                             question.replies?.map((reply => (
@@ -80,6 +85,7 @@ export const Questions = ({ chapterId, courseId }: Props) => {
         </div>
     )
 }
+
 
 const QuestionSkeleton = () => {
     return (

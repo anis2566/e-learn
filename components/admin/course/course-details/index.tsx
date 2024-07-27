@@ -1,6 +1,6 @@
 "use client"
 
-import { Chapter, Course } from "@prisma/client"
+import { Chapter, Course, CourseTeacher, Teacher } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query";
 import { CircleDollarSign, LayoutDashboard, ListChecks } from "lucide-react";
 
@@ -14,9 +14,19 @@ import { ImageForm } from "./form/image-form";
 import { CategoryForm } from "./form/category-form";
 import { PriceForm } from "./form/price-form";
 import { ChaptersForm } from "./form/chapters-form";
+import { GET_TEACHERS } from "@/actions/teacher.action";
+import { TeacherForm } from "./form/teacher-form";
+
+interface TeacherWithCourse extends CourseTeacher {
+    teacher: Teacher;
+}
+
+interface CourseWithTeacher extends Course {
+    teachers: TeacherWithCourse[];
+}
 
 interface Props {
-    course: Course;
+    course: CourseWithTeacher;
     chapters: Chapter[]
 }
 
@@ -26,6 +36,15 @@ export const CourseDetails = ({ course, chapters }: Props) => {
         queryFn: async () => {
             const res = await GET_CATEGORIES();
             return res.categories
+        },
+        staleTime: 60 * 60 * 1000
+    })
+
+    const { data: teachers } = useQuery({
+        queryKey: ["get-teachers-for-course"],
+        queryFn: async () => {
+            const res = await GET_TEACHERS();
+            return res.teachers
         },
         staleTime: 60 * 60 * 1000
     })
@@ -118,6 +137,11 @@ export const CourseDetails = ({ course, chapters }: Props) => {
                             <PriceForm
                                 initialData={course}
                                 courseId={course.id}
+                            />
+                            <TeacherForm
+                                initialData={course}
+                                courseId={course.id}
+                                teachers={teachers ?? []}
                             />
                         </div>
                     </div>

@@ -29,6 +29,8 @@ import {
     BookOpenCheck,
     BookOpen,
     Headset,
+    User,
+    UsersRound,
   } from "lucide-react";
   
   type Submenu = {
@@ -117,6 +119,31 @@ import {
           },
         ],
       },
+      {
+        groupLabel: "Teacher",
+        menus: [
+          {
+            href: "",
+            label: "Teacher",
+            active: pathname.includes("/admin/teacher"),
+            icon: UsersRound,
+            submenus: [
+              {
+                href: "/admin/teacher/request",
+                label: "Request",
+                active: pathname === "/admin/teacher/request",
+                icon: Radio,
+              },
+              {
+                href: "/admin/teacher",
+                label: "List",
+                active: pathname === "/admin/teacher",
+                icon: List,
+              },
+            ],
+          },
+        ],
+      },
     ];
   }
   
@@ -175,6 +202,13 @@ import {
             label: "Dashboard",
             active: pathname === "/teacher",
             icon: LayoutGrid,
+            submenus: [],
+          },
+          {
+            href: "/teacher/courses",
+            label: "My Courses",
+            active: pathname === "/teacher/courses",
+            icon: BookOpen,
             submenus: [],
           },
           {

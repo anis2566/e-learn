@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server"
 
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
+import { Role } from "@prisma/client"
 
 export const getUser = async () => {
     const { userId } = auth()
@@ -26,43 +27,43 @@ export const getUser = async () => {
 }
 
 
-// export const getScout = async () => {
-//     const { userId } = auth()
+export const getTeacher = async () => {
+    const { userId } = auth()
     
-//     if (!userId) {
-//         redirect("/sign-in")
-//     }
+    if (!userId) {
+        redirect("/sign-in")
+    }
     
-//     const scout = await db.scout.findFirst({
-//         where: {
-//             user: {
-//                 clerkId: userId
-//             }
-//         }
-//     })
+    const teacher = await db.teacher.findFirst({
+        where: {
+            user: {
+                clerkId: userId
+            }
+        }
+    })
 
-//     if (!scout) {
-//         throw new Error("Scout not found")
-//     }
+    if (!teacher) {
+        throw new Error("Teacher not found")
+    }
 
-//     return {scout, scoutId: scout.id, role: scout.role, clerkId: userId, status: scout.status}
-// }
+    return {teacher, teacherId: teacher.id}
+}
 
 
-// export const getAdmin = async () => {
-//     const admin = await db.user.findFirst({
-//         where: {
-//             role: Role.Admin
-//         }
-//     })
+export const getAdmin = async () => {
+    const admin = await db.user.findFirst({
+        where: {
+            role: Role.Admin
+        }
+    })
 
-//     if (!admin) {
-//         throw new Error("Admin not found")
-//     }
+    if (!admin) {
+        throw new Error("Admin not found")
+    }
 
-//     return {
-//         admin,
-//         adminId: admin.id,
-//         adminClerkId: admin.clerkId
-//     }
-// }
+    return {
+        admin,
+        adminId: admin.id,
+        adminClerkId: admin.clerkId
+    }
+}

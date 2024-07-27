@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,43 +13,31 @@ import {
 
 import { db } from "@/lib/db";
 import { ContentLayout } from "@/components/admin/content-layout"
-import { CourseDetails } from "@/components/admin/course/course-details";
+import { EditForm } from "./_components/edit-form";
+import { BackButton } from "@/components/back-button";
 
 export const metadata: Metadata = {
-    title: "E-Learn | Course",
+    title: "E-Learn | Edit Teacher",
     description: "E-learning Web Application",
 };
 
 interface Props {
     params: {
-        id: string;
+        teacherId: string;
     }
 }
 
-const Course = async ({ params: { id } }: Props) => {
-    const course = await db.course.findUnique({
+
+const EditTeacher = async ({ params: { teacherId } }: Props) => {
+    const teacher = await db.teacher.findUnique({
         where: {
-            id
-        },
-        include: {
-            teachers: {
-                include: {
-                    teacher: true
-                }
-            }
+            id: teacherId
         }
     })
-
-    if (!course) redirect("/admin")
-
-    const chapters = await db.chapter.findMany({
-        orderBy: {
-            position: "asc"
-        }
-    })
+    if (!teacher) redirect("/admin")
 
     return (
-        <ContentLayout title="Course">
+        <ContentLayout title="Teacher">
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -61,19 +48,21 @@ const Course = async ({ params: { id } }: Props) => {
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link href="/admin/course">Courses</Link>
+                            <Link href="/admin/teacher">Teachers</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Details</BreadcrumbPage>
+                        <BreadcrumbPage>Edit</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <CourseDetails course={course} chapters={chapters} />
+            <BackButton />
+
+            <EditForm teacher={teacher} id={teacherId} />
         </ContentLayout>
     )
 }
 
-export default Course
+export default EditTeacher

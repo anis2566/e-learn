@@ -3,7 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Pencil} from "lucide-react";
+import { Pencil } from "lucide-react";
 import { Chapter } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 import { GET_CREDENTIALS, UPLOAD_VIDEO } from "@/actions/video-cipher.action";
+import { VideoPlayer } from "@/components/video-player";
 
 interface ChapterVideoFormProps {
     initialData: Chapter;
@@ -106,7 +107,7 @@ export const ChapterVideoForm = ({
     }
 
     return (
-        <div className="mt-6 border bg-muted rounded-md p-4">
+        <div className="mt-6 border bg-muted rounded-md p-4 mb-10">
             <div className="font-medium flex items-center justify-between">
                 Chapter Video
                 <Button onClick={toggleEdit} variant="ghost">
@@ -120,22 +121,9 @@ export const ChapterVideoForm = ({
                     )}
                 </Button>
             </div>
-            {!isEditing && (
-                <div>
-                    {
-                        initialData.videoUrl ? (
-                            <div className="relative aspect-video mt-2">
-                                <video
-                                    src={initialData.videoUrl}
-                                    controls
-                                />
-                            </div>
-                        ) : (
-                            <p className="italic">No video yet</p>
-                        )
-                    }
-                </div>
-            )}
+            {!isEditing && initialData.videoUrl ? (
+                <VideoPlayer videoId={initialData.videoUrl} />
+            ) : null}
             {isEditing && (
                 <Form {...form}>
                     <form
@@ -163,16 +151,16 @@ export const ChapterVideoForm = ({
                                     <FormControl>
                                         <div className="grid w-full items-center gap-1.5">
                                             <Label htmlFor="video">Video</Label>
-                                            <Input 
-                                                id="video" 
-                                                type="file" 
-                                                accept="video/*" 
+                                            <Input
+                                                id="video"
+                                                type="file"
+                                                accept="video/*"
                                                 onChange={(e) => {
                                                     if (e.target.files && e.target.files[0]) {
                                                         field.onChange(e.target.files[0]);
                                                     }
                                                 }}
-                                                disabled={isPending || isLoading} 
+                                                disabled={isPending || isLoading}
                                             />
                                         </div>
                                     </FormControl>
@@ -188,6 +176,7 @@ export const ChapterVideoForm = ({
                                 Save
                             </Button>
                         </div>
+                        <p>flafjalfjla</p>
                     </form>
                 </Form>
             )}

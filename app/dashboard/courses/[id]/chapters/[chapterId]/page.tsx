@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { FileQuestion, Paperclip } from "lucide-react";
+import { Clock3, FileQuestion, Paperclip } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -83,7 +83,8 @@ const Chapter = ({ params: { id, chapterId } }: Props) => {
                                 <div className="-ml-3">
                                     <Preview value={data?.chapter?.description || ""} />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-4">
+                                    <ListBox title="Duration" icon={Clock3} description={"2 hours"} />
                                     <ListBox title="Attachments" icon={Paperclip} description={data?.chapter?.attachments?.length?.toString() || "0"} />
                                     <ListBox title="Questions" icon={FileQuestion} description={data?.chapter?.questions?.length?.toString() || "0"} />
                                 </div>

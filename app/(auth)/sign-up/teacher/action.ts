@@ -2,7 +2,8 @@
 
 import { db } from "@/lib/db"
 import { TeacherSchema, TeacherSchemaType } from "@/schema/teacher.schema"
-import { getUser } from "@/services/user.service"
+import { sendNotification } from "@/services/notification.service"
+import { getAdmin, getUser } from "@/services/user.service"
 import { clerkClient } from "@clerk/nextjs/server"
 import { Role } from "@prisma/client"
 
@@ -28,7 +29,7 @@ export const APPLY_TEACHER = async (values: TeacherSchemaType) => {
         throw new Error("Teacher already exists")
     }
 
-    const {userId, clerkId} = await getUser()
+    const {userId, clerkId, user} = await getUser()
 
     const updatedUser = await db.user.update({
         where: {
@@ -53,6 +54,19 @@ export const APPLY_TEACHER = async (values: TeacherSchemaType) => {
         }
     })
 
+    const {adminId} = await getAdmin()
+
+    await sendNotification({
+        trigger: "teacher-request",
+        actor: {
+            id: userId,
+            name: user.name
+        },
+        recipients: [adminId],
+        data: {
+            redirectUrl: "/admin/teacher/request"
+        }
+    })
 
     return {
         success: "Registration successful"
