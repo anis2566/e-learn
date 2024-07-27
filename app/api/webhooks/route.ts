@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       },
     });
 
-    await knock.users.identify(evt.data.id, {
+    await knock.users.identify(user.id, {
       name: user.name,
       avatar: user.imageUrl,
     });
@@ -94,14 +94,22 @@ export async function POST(req: Request) {
       },
     });
 
-    await knock.users.identify(evt.data.id, {
+    await knock.users.identify(user.id, {
       name: user.name,
       avatar: user.imageUrl,
-    });
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   if (eventType === "user.deleted") {
-    await knock.users.delete(evt.data.id || "");
+    const user = await db.user.findUnique({
+      where: {
+        clerkId: evt.data.id
+      }
+    })
+
+    await knock.users.delete(user?.id || "");
     
     await db.user.delete({
       where: {
