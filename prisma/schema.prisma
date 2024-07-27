@@ -19,6 +19,12 @@ enum Role {
   Teacher
 }
 
+enum Status {
+  Pending
+  Active
+  Suspended
+}
+
 
 model User {
   id String @id @default(uuid())
@@ -47,6 +53,7 @@ model Teacher {
   imageUrl String
   bio String @db.Text
   experience Int? 
+  status Status @default(Pending)
 
   userId String @unique
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

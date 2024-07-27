@@ -82,7 +82,7 @@ export async function POST(req: Request) {
   }
 
   if (eventType === "user.updated") {
-    await db.user.update({
+    const user = await db.user.update({
       where: {
         clerkId: evt.data.id,
       },
@@ -90,15 +90,22 @@ export async function POST(req: Request) {
         email: evt.data.email_addresses[0].email_address,
         name: `${evt.data.first_name} ${evt.data.last_name}`,
         imageUrl: evt.data.image_url,
-        role: evt.data.public_metadata?.role as Role || Role.User
+        role: (evt.data.public_metadata?.role as Role) || Role.User,
       },
+    });
+
+    await knock.users.identify(evt.data.id, {
+      name: user.name,
+      avatar: user.imageUrl,
     });
   }
 
   if (eventType === "user.deleted") {
+    await knock.users.delete(evt.data.id || "");
+    
     await db.user.delete({
       where: {
-        clerkId: evt.data.id
+        clerkId: evt.data.id,
       },
     });
   }

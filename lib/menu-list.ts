@@ -164,3 +164,27 @@ import {
       },
     ];
   }
+
+  export function getMenuListTeacher(pathname: string): Group[] {
+    return [
+      {
+        groupLabel: "",
+        menus: [
+          {
+            href: "/teacher",
+            label: "Dashboard",
+            active: pathname === "/teacher",
+            icon: LayoutGrid,
+            submenus: [],
+          },
+          {
+            href: "/teacher/support",
+            label: "Support",
+            active: pathname === "/teacher/support",
+            icon: Headset,
+            submenus: [],
+          },
+        ],
+      },
+    ];
+  }

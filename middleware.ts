@@ -1,4 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { Role } from "@prisma/client";
+import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher([
   "/dashboard",
@@ -9,21 +11,21 @@ const isProtectedRoute = createRouteMatcher([
 export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) {
     const role = auth().sessionClaims?.role as string;
-    console.log(role)
-    // const isScout = role?.split(" ")?.includes("Scout")
+    const isTeacher = role === Role.Teacher
+    const isAdmin = role === Role.Admin
     if (!auth().userId) {
       auth().protect(); 
     } else {
-      // if (req.nextUrl.pathname.startsWith("/scout") && !isScout) {
-      //   return NextResponse.redirect(new URL("/apply", req.url));
+      if (req.nextUrl.pathname.startsWith("/teacher") && !isTeacher) {
+        return NextResponse.redirect(new URL("/sign-up/teacher", req.url));
+      }
+      // if (req.nextUrl.pathname.startsWith("/scout") && status === "pending") {
+      //   return NextResponse.redirect(new URL("/scout/pending", req.url));
       // }
-      // // if (req.nextUrl.pathname.startsWith("/scout") && status === "pending") {
-      // //   return NextResponse.redirect(new URL("/scout/pending", req.url));
-      // // }
 
-      // // if (req.nextUrl.pathname.startsWith("/dashboard") && role !== "admin") {
-      // //   return NextResponse.redirect(new URL("/", req.url));
-      // // }
+      // if (req.nextUrl.pathname.startsWith("/dashboard") && role !== "admin") {
+      //   return NextResponse.redirect(new URL("/", req.url));
+      // }
     }
   }
 });
