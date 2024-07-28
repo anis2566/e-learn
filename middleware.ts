@@ -2,20 +2,19 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { Role } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-const isProtectedRoute = createRouteMatcher([
-  "/dashboard",
-  "/teacher(.*)"
-]);
-
+const isProtectedRoute = createRouteMatcher(["/dashboard", "/teacher(.*)", "/api/payment"]);
 
 export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) {
     const role = auth().sessionClaims?.role as string;
-    const isTeacher = role === Role.Teacher
-    const isAdmin = role === Role.Admin
+    const isTeacher = role === Role.Teacher;
+    const isAdmin = role === Role.Admin;
     if (!auth().userId) {
-      auth().protect(); 
+      auth().protect();
     } else {
+      if(req.nextUrl.pathname === "/api/payment") {
+        return NextResponse.next()
+      }
       if (req.nextUrl.pathname.startsWith("/teacher") && !isTeacher) {
         return NextResponse.redirect(new URL("/sign-up/teacher", req.url));
       }

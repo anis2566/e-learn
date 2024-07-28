@@ -19,7 +19,7 @@ export const CourseNavbar = ({ course }: Props) => {
             <div className="mx-2 sm:mx-8 flex justify-between h-14 items-center">
                 {/* <CourseNavDrawer course={course} purchased={purchased} /> */}
                 <div className="flex items-center space-x-4 lg:space-x-0">
-                    <Logo callbackUrl="/dashboard" />
+                    <Logo callbackUrl="/teacher" />
                 </div>
                 <div className="flex items-center space-x-2 justify-end">
                     <ModeToggle />

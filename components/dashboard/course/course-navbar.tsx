@@ -4,6 +4,7 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { UserNav } from "../layout/navbar/user-nav"
 import { Logo } from "@/components/logo"
 import { CourseNavDrawer } from "./course-nav-drawer"
+import { Notification } from "@/components/notification";
 
 interface ChapterWithProgress extends Chapter {
     userProgress: UserProgress[]
@@ -28,7 +29,7 @@ export const CourseNavbar = ({course, purchased}:Props) => {
                 </div>
                 <div className="flex items-center space-x-2 justify-end">
                     <ModeToggle />
-                    {/* <Notification /> */}
+                    <Notification />
                     <UserNav />
                 </div>
             </div>

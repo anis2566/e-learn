@@ -7,6 +7,8 @@ import { VideoPlayer } from "@/components/video-player";
 import { VideoController } from "@/components/video-controller";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { INIT_PAYMENT } from "@/services/payment.service";
 
 interface CoursePlayerProps {
     videoId: string;
@@ -32,6 +34,19 @@ export const CoursePlayer = ({
     course
 }: CoursePlayerProps) => {
 
+    const { mutate } = useMutation({
+        mutationFn: INIT_PAYMENT,
+        onSuccess: (data) => {
+            console.log(data?.data?.payment_url)
+            if(data.data?.payment_url) {
+                window.location.href = data.data?.payment_url
+            }
+        },
+        onError: (error) => {
+            console.log(error)
+        }
+    })
+
     return (
         <div className="space-y-4">
             <div className="relative aspect-video">
@@ -54,7 +69,7 @@ export const CoursePlayer = ({
             </div>
             {!purchased && (
                 <div className="flex justify-end">
-                    <Button>Enroll with {formatPrice(course?.price ?? 0)}</Button>
+                    <Button onClick={() => mutate()}>Enroll with {formatPrice(course?.price ?? 0)}</Button>
                 </div>
             )}
             {

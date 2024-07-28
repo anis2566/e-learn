@@ -24,11 +24,11 @@ export const CREATE_QUESTION = async (values: QuestionSchemaType) => {
             include: {
               user: {
                 select: {
-                  id: true
-                }
-              }
-            }
-          }
+                  id: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -110,8 +110,8 @@ export const GET_QUESTIONS = async ({
       replies: {
         include: {
           user: true,
-          teacher: true
-        }
+          teacher: true,
+        },
       },
     },
     orderBy: {
@@ -120,7 +120,15 @@ export const GET_QUESTIONS = async ({
     take: perPage * page,
   });
 
+  const totalQuestion = await db.question.count({
+    where: {
+      courseId,
+      chapterId,
+    },
+  });
+
   return {
     questions,
+    totalQuestion
   };
 };

@@ -11,6 +11,9 @@ import { DeleteCourseModal } from "@/components/modal/admin/course/delete-course
 import { TeacherStatusModal } from "@/app/admin/teacher/request/_components/status-modal"
 import TeacherDeleteModal from "@/app/admin/teacher/request/_components/delete-modal"
 import { QuestionReplyModal } from "@/app/teacher/courses/[id]/chapters/[chapterId]/_components/reply-modal"
+import { StudentQuestionReplyModal } from "@/app/dashboard/courses/[id]/chapters/[chapterId]/_components/reply-modal"
+import { DeleteQuestionModal } from "@/app/admin/question/[id]/_components/delete-modal"
+import { DeleteReplyModal } from "@/app/admin/question/[id]/_components/delete-reply-modal"
 
 
 export const ModalProvider = () => {
@@ -29,6 +32,9 @@ export const ModalProvider = () => {
             <TeacherStatusModal />
             <TeacherDeleteModal />
             <QuestionReplyModal />
+            <StudentQuestionReplyModal />
+            <DeleteQuestionModal />
+            <DeleteReplyModal />
         </>
     )
 }

@@ -1,9 +1,11 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { ReplyIcon } from "lucide-react";
 import { useState } from "react";
+import ReactTimeAgo from 'react-time-ago'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { GET_QUESTIONS } from "@/actions/question.action";
 import { cn } from "@/lib/utils";
 import { useQuestionReply } from "@/hooks/use-question";
+
+TimeAgo.addDefaultLocale(en)
 
 interface Props {
     courseId: string;
@@ -48,7 +52,7 @@ export const Questions = ({ chapterId, courseId }: Props) => {
                             <div className="flex-1 space-y-2">
                                 <div>
                                     <div className="font-medium text-md">{question.user?.name}</div>
-                                    <span className="text-xs text-muted-foreground">{format(question.createdAt, "dd MMM yyyy")}</span>
+                                    <ReactTimeAgo date={question.createdAt} locale="en-US" className="text-xs" />
                                 </div>
                                 <p className="text-sm text-muted-foreground">
                                     {question.title}
@@ -67,7 +71,7 @@ export const Questions = ({ chapterId, courseId }: Props) => {
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <div className="font-medium text-md">{reply.teacher?.name || reply.user?.name}</div>
-                                                <span className="text-xs text-muted-foreground">{format(reply.createdAt, "dd MMM yyyy")}</span>
+                                                <ReactTimeAgo date={reply.createdAt} locale="en-US" className="text-xs" />
                                             </div>
                                             <ReplyIcon className="w-4 h-4 text-muted-foreground" />
                                         </div>

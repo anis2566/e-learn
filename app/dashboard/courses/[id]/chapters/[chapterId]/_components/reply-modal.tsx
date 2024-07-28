@@ -21,7 +21,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { useQuestionReply } from "@/hooks/use-question"
+import { useStudentQuestionReply } from "@/hooks/use-question"
 import { Textarea } from "@/components/ui/textarea"
 import { QUESTION_REPLY } from "../action"
 
@@ -30,9 +30,10 @@ const formSchema = z.object({
 })
 
 
-export const QuestionReplyModal = () => {
+export const StudentQuestionReplyModal = () => {
 
-    const { id, open, onClose } = useQuestionReply()
+    const { id, open, onClose } = useStudentQuestionReply()
+
     const queryClient = useQueryClient()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -46,10 +47,10 @@ export const QuestionReplyModal = () => {
         mutationFn: QUESTION_REPLY,
         onSuccess: (data) => {
             queryClient.invalidateQueries({
-                queryKey: ["chpater-questions-for-teacher"]
+                queryKey: ["chpater-questions"]
             })
             queryClient.refetchQueries({
-                queryKey: ["chpater-questions-for-teacher"]
+                queryKey: ["chpater-questions"]
             })
             onClose()
             toast.success(data?.success, {
@@ -70,6 +71,7 @@ export const QuestionReplyModal = () => {
         })
         replyQuestion({ id, reply: values.reply })
     }
+
     return (
         <Dialog open={open && !!id} onOpenChange={onClose}>
             <DialogContent>

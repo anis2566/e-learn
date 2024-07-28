@@ -1,7 +1,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { getTeacher } from "@/services/user.service";
+import { sendNotification } from "@/services/notification.service";
+import { getTeacher, getUser } from "@/services/user.service";
 
 type GetChapter = {
   courseId: string;
@@ -111,6 +112,19 @@ export const QUESTION_REPLY = async ({ id, reply }: QuestionReply) => {
       questionId: id,
       reply,
       teacherId,
+    },
+  });
+
+  const { user, userId } = await getUser();
+  await sendNotification({
+    trigger: "question-reply",
+    actor: {
+      id: userId,
+      name: user.name,
+    },
+    recipients: [question.userId],
+    data: {
+      redirectUrl: `/dashboard/courses/${question.courseId}/chapters/${question.chapterId}`,
     },
   });
 

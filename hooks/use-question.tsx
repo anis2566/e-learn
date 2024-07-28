@@ -7,7 +7,14 @@ interface QuestionStat {
   onClose: () => void;
 }
 
-export const useTeacher = create<QuestionStat>()((set) => ({
+export const useQuestion = create<QuestionStat>()((set) => ({
+  open: false,
+  id: "",
+  onOpen: (id) => set({ open: true, id }),
+  onClose: () => set({ open: false, id: "" }),
+}));
+
+export const useReply = create<QuestionStat>()((set) => ({
   open: false,
   id: "",
   onOpen: (id) => set({ open: true, id }),
@@ -20,3 +27,12 @@ export const useQuestionReply = create<QuestionStat>()((set) => ({
   onOpen: (id) => set({ open: true, id }),
   onClose: () => set({ open: false, id: "" }),
 }));
+
+
+export const useStudentQuestionReply = create<QuestionStat>()((set) => ({
+  open: false,
+  id: "",
+  onOpen: (id) => set({ open: true, id }),
+  onClose: () => set({ open: false, id: "" }),
+}));
+

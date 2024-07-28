@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Clock3 } from "lucide-react";
 import { Category, Chapter, Course } from "@prisma/client";
 
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +44,12 @@ export const CourseCard = ({ course }: Props) => {
                             <IconBadge size="sm" icon={BookOpen} />
                             <span>
                                 {course.chapters?.length} {course.chapters?.length === 1 ? "Chapter" : "Chapters"}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-x-1">
+                            <IconBadge size="sm" icon={Clock3} />
+                            <span>
+                                2 hours
                             </span>
                         </div>
                     </div>
