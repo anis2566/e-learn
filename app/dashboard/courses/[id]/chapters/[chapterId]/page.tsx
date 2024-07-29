@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { Clock3, FileQuestion, Paperclip } from "lucide-react";
+import { Clock3, FileQuestion, Headset, Paperclip } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,10 @@ import { QuestionForm } from "@/components/dashboard/chapter/question-form";
 import { ListBox } from "@/components/list-box";
 import { cn } from "@/lib/utils";
 import { Attachments } from "@/components/dashboard/chapter/attachments";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface Props {
     params: {
@@ -77,16 +81,68 @@ const Chapter = ({ params: { id, chapterId } }: Props) => {
                 }
                 {
                     isLoading ? <CourseDetailsSkeleton /> : (
-                        <Card className="h-[40vh]">
-                            <CardContent className="p-3">
+                        <Card className="">
+                            <CardContent className="p-3 space-y-4">
                                 <h1 className="text-xl font-semibold text-primary/80">{data?.chapter?.title}</h1>
                                 <div className="-ml-3">
                                     <Preview value={data?.chapter?.description || ""} />
                                 </div>
-                                <div className="space-y-4">
+                                <div className="grid grid-cols-2 gap-3">
                                     <ListBox title="Duration" icon={Clock3} description={"2 hours"} />
                                     <ListBox title="Attachments" icon={Paperclip} description={data?.chapter?.attachments?.length?.toString() || "0"} />
                                     <ListBox title="Questions" icon={FileQuestion} description={data?.chapter?.questions?.length?.toString() || "0"} />
+                                </div>
+                                <div className="space-y-3">
+                                    <Badge className="flex items-center gap-x-3 max-w-fit mx-auto p-2 text-md px-4" variant="outline">
+                                        <Headset className="w-5 h-5" />
+                                        Get in touch
+                                    </Badge>
+                                    <div className="space-y-3">
+                                        {
+                                            data?.course?.teachers?.map(item => (
+                                                <div key={item.teacherId} className="shadow-sm shadow-primary p-2 rounded-md w-full flex justify-between">
+                                                    <div className="flex items-center gap-x-2">
+                                                        <Avatar>
+                                                            <AvatarImage src={item.teacher.imageUrl} className="w-8 h-8 rounded-full" />
+                                                            <AvatarFallback>{item.teacher.name.charAt(0)}</AvatarFallback>
+                                                        </Avatar>
+                                                        <div>
+                                                            <p className="text-lg font-semibold">
+                                                                {item.teacher.name}
+                                                            </p>
+                                                            <Badge variant="outline">
+                                                                Teacher
+                                                            </Badge>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-x-2">
+                                                        <Button variant="secondary" asChild>
+                                                            <Link href={`/dashboard/support?user=${item.teacher.user.clerkId}`}>Send Message</Link>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
+                                        <div className="shadow-sm shadow-primary p-2 rounded-md w-full flex justify-between">
+                                            <div className="flex items-center gap-x-2">
+                                                <Avatar>
+                                                    <AvatarImage src={data?.admin?.admin?.imageUrl} className="w-8 h-8 rounded-full" />
+                                                    <AvatarFallback>{data?.admin?.admin?.name.charAt(0)}</AvatarFallback>
+                                                </Avatar>
+                                                <div>
+                                                    <p className="text-lg font-semibold">
+                                                        {data?.admin?.admin?.name}
+                                                    </p>
+                                                    <Badge variant="outline">Admin</Badge>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-x-2">
+                                                <Button variant="secondary" asChild>
+                                                    <Link href={`/dashboard/support?user=${data?.admin?.adminClerkId}`}>Send Message</Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Status } from "@prisma/client";
 
 import {
     Breadcrumb,
@@ -12,14 +11,8 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { ContentLayout } from "@/components/admin/content-layout"
-import { Header } from "@/components/admin/category/header";
-import { db } from "@/lib/db";
-import { CustomPagination } from "@/components/custom-pagination";
-import RequestList from "./_components/list";
-
 export const metadata: Metadata = {
-    title: "E-Learn | Teacher Request",
+    title: "E-Learn | Teachers",
     description: "E-learning Web Application",
 };
 
@@ -32,15 +25,27 @@ interface Props {
     }
 };
 
-const Requests = async ({ searchParams }: Props) => {
+import { ContentLayout } from "@/components/admin/content-layout"
+import { db } from "@/lib/db";
+import { Header } from "@/components/admin/category/header";
+import { TeacherList } from "./_components/list";
+import { CustomPagination } from "@/components/custom-pagination";
+
+const Teachers = async ({ searchParams }: Props) => {
     const { search, page, perPage, sort } = searchParams
     const itemsPerPage = parseInt(perPage) || 5;
     const currentPage = parseInt(page) || 1;
 
     const teachers = await db.teacher.findMany({
         where: {
-            status: Status.Pending,
             ...(search && { name: { contains: search, mode: "insensitive" } })
+        },
+        include: {
+            courses: {
+                select: {
+                    courseId: true
+                }
+            }
         },
         orderBy: {
             createdAt: sort === "asc" ? "asc" : "desc"
@@ -51,7 +56,6 @@ const Requests = async ({ searchParams }: Props) => {
 
     const totalTeacher = await db.teacher.count({
         where: {
-            status: Status.Pending,
             ...(search && { name: { contains: search, mode: "insensitive" } })
         },
     })
@@ -69,17 +73,10 @@ const Requests = async ({ searchParams }: Props) => {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink asChild>
-                            <Link href="/admin/teacher">Teachers</Link>
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbPage>Request</BreadcrumbPage>
+                        <BreadcrumbPage>Teachers</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
-
             <Card>
                 <CardHeader>
                     <CardTitle>List</CardTitle>
@@ -87,7 +84,7 @@ const Requests = async ({ searchParams }: Props) => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <Header />
-                    <RequestList teachers={teachers} />
+                    <TeacherList teachers={teachers} />
                     <CustomPagination totalPage={totalPage} />
                 </CardContent>
             </Card>
@@ -95,4 +92,4 @@ const Requests = async ({ searchParams }: Props) => {
     )
 }
 
-export default Requests
+export default Teachers

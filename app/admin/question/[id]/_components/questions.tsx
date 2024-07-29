@@ -42,7 +42,7 @@ export const Questions = ({ questions }: Props) => {
         <div className="w-full py-2 overflow-y-auto space-y-6">
             {
                 questions?.map(question => (
-                    <div className="space-y-4" key={question.id}>
+                    <div className="space-y-4 shadow-sm shadow-secondary/40 pb-2" key={question.id}>
                         <div className="flex items-start gap-4">
                             <Avatar className="w-10 h-10 border">
                                 <AvatarImage src={question.user?.imageUrl} />

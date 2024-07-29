@@ -2,13 +2,14 @@
 
 import { Loader2, Lock } from "lucide-react";
 import { Course } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
+
+import { Button } from "@/components/ui/button";
 
 import { VideoPlayer } from "@/components/video-player";
 import { VideoController } from "@/components/video-controller";
-import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
-import { useMutation } from "@tanstack/react-query";
-import { INIT_PAYMENT } from "@/services/payment.service";
+import { CREATE_PAYMENT, GENERATE_BKASH_TOKEN } from "@/services/payment.service";
 
 interface CoursePlayerProps {
     videoId: string;
@@ -33,13 +34,26 @@ export const CoursePlayer = ({
     purchased,
     course
 }: CoursePlayerProps) => {
-
-    const { mutate } = useMutation({
-        mutationFn: INIT_PAYMENT,
+    const { mutate: createPayment } = useMutation({
+        mutationFn: CREATE_PAYMENT,
         onSuccess: (data) => {
-            console.log(data?.data?.payment_url)
-            if(data.data?.payment_url) {
-                window.location.href = data.data?.payment_url
+            if (data?.url) {
+                window.location.replace(data?.url)
+            }
+        },
+        onError: (error) => {
+            console.log(error)
+        }
+    })
+
+    const { mutate: generateToken, isPending } = useMutation({
+        mutationFn: GENERATE_BKASH_TOKEN,
+        onSuccess: (data) => {
+            console.log(data)
+            if (course?.price) {
+                if (data?.token) {
+                    createPayment({ amount: course.price, token: data?.token, courseId })
+                }
             }
         },
         onError: (error) => {
@@ -69,7 +83,7 @@ export const CoursePlayer = ({
             </div>
             {!purchased && (
                 <div className="flex justify-end">
-                    <Button onClick={() => mutate()}>Enroll with {formatPrice(course?.price ?? 0)}</Button>
+                    <Button onClick={() => generateToken()} disabled={isPending}>Enroll with {formatPrice(course?.price ?? 0)}</Button>
                 </div>
             )}
             {

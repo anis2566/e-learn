@@ -1,6 +1,7 @@
 "use server";
 
 import axios from "axios";
+import { getUser } from "./user.service";
 
 export const GENERATE_BKASH_TOKEN = async () => {
   const res = await axios.post(
@@ -25,16 +26,17 @@ export const GENERATE_BKASH_TOKEN = async () => {
   };
 };
 
-type CreatePaymentRegister = {
+type CreatePayement = {
   token: string;
-  scoutId: string;
   amount: number;
+  courseId: string;
 };
 export const CREATE_PAYMENT = async ({
   token,
-  scoutId,
   amount,
-}: CreatePaymentRegister) => {
+  courseId,
+}: CreatePayement) => {
+  const { userId } = await getUser();
   const res = await axios.post(
     process.env.NEXT_PUBLIC_PGW_BKASH_CREATE_PAYMENT_URL!,
     {
@@ -43,8 +45,8 @@ export const CREATE_PAYMENT = async ({
       callbackURL: `${
         process.env.NODE_ENV === "development"
           ? "http://localhost:3000"
-          : "https://apbn.vercel.app"
-      }/api/payment/register/verify?token=${token}&scoutId=${scoutId}`,
+          : "https://e-learn-orpin.vercel.app"
+      }/api/payment/verify?token=${token}&userId=${userId}&courseId=${courseId}`,
       amount: amount,
       currency: "BDT",
       intent: "sale",

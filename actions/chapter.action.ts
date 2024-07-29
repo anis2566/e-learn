@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { getUser } from "@/services/user.service";
+import { getAdmin, getUser } from "@/services/user.service";
 import { Attachment, Chapter } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
@@ -200,6 +200,15 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
             id: true
           }
         },
+        teachers: {
+          include: {
+            teacher: {
+              include: {
+                user: true
+              }
+            }
+          }
+        }
       }
     });
 
@@ -273,6 +282,8 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
       },
     });
 
+    const admin = await getAdmin()
+
     return {
       chapter,
       course,
@@ -281,6 +292,7 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
       nextChapter,
       userProgress,
       purchased,
+      admin
     };
   } catch (error) {
     return {
@@ -290,6 +302,7 @@ export const GET_CHAPTER = async ({ chapterId, courseId }: GetChapter) => {
       nextChapter: null,
       userProgress: null,
       purchase: null,
+      admin: null
     };
   }
 };

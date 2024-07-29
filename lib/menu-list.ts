@@ -32,6 +32,7 @@ import {
   User,
   UsersRound,
   MessageCircleQuestion,
+  MessagesSquare,
 } from "lucide-react";
 
 type Submenu = {
@@ -149,6 +150,18 @@ export function getMenuList(pathname: string): Group[] {
               icon: List,
             },
           ],
+        },
+      ],
+    },
+    {
+      groupLabel: "Support",
+      menus: [
+        {
+          href: "/admin/support",
+          label: "Messages",
+          active: pathname.includes("/admin/support"),
+          icon: MessagesSquare,
+          submenus: [],
         },
       ],
     },

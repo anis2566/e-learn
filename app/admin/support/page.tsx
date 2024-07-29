@@ -9,8 +9,8 @@ import {
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 
-import { ContentLayout } from "@/components/dashboard/content-layout"
 import { ChatPage } from "./_components/chat";
+import { ContentLayout } from "@/components/admin/content-layout";
 
 const Support = () => {
     return (
@@ -19,7 +19,7 @@ const Support = () => {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Link href="/dashboard">Dashboard</Link>
+                            <Link href="/admin">Dashboard</Link>
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
