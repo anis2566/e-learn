@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --experimental-https",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
@@ -50,6 +50,8 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.1.5",
+    "firebase": "^10.12.4",
+    "firebase-admin": "^12.3.0",
     "framer-motion": "^11.2.12",
     "input-otp": "^1.2.4",
     "javascript-time-ago": "^2.5.10",

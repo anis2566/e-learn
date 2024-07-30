@@ -60,50 +60,59 @@ export async function POST(req: Request) {
   console.log("Webhook body:", body);
 
   if (eventType === "user.created") {
-    const user = await db.user.create({
-      data: {
-        email: evt.data.email_addresses[0].email_address,
-        name: `${evt.data.first_name} ${evt.data.last_name}`,
-        clerkId: evt.data.id,
-        imageUrl: evt.data.image_url,
-      },
-    });
+    await db.$transaction(async (ctx) => {
+      const user = await ctx.user.create({
+        data: {
+          email: evt.data.email_addresses[0].email_address,
+          name: `${evt.data.first_name} ${evt.data.last_name}`,
+          clerkId: evt.data.id,
+          imageUrl: evt.data.image_url,
+        },
+      });
 
-    await clerkClient.users.updateUserMetadata(evt.data.id, {
-      publicMetadata: {
-        role: user.role,
-      },
-    });
+      await clerkClient.users.updateUserMetadata(evt.data.id, {
+        publicMetadata: {
+          role: user.role,
+        },
+      });
 
-
-    await knock.users.identify(evt.data.id, {
-      name: user.name,
-      avatar: user.imageUrl,
+      await knock.users.identify(evt.data.id, {
+        name: user.name,
+        avatar: user.imageUrl,
+      });
     });
   }
 
   if (eventType === "user.updated") {
-    await db.user.update({
-      where: {
-        clerkId: evt.data.id,
-      },
-      data: {
-        email: evt.data.email_addresses[0].email_address,
-        name: `${evt.data.first_name} ${evt.data.last_name}`,
-        imageUrl: evt.data.image_url,
-        role: (evt.data.public_metadata?.role as Role) || Role.User,
-      },
+    await db.$transaction(async (ctx) => {
+      const user = await ctx.user.update({
+        where: {
+          clerkId: evt.data.id,
+        },
+        data: {
+          email: evt.data.email_addresses[0].email_address,
+          name: `${evt.data.first_name} ${evt.data.last_name}`,
+          imageUrl: evt.data.image_url,
+          role: (evt.data.public_metadata?.role as Role) || Role.User,
+        },
+      });
+      await knock.users.identify(evt.data.id, {
+        name: user.name,
+        avatar: user.imageUrl,
+      });
     });
   }
 
   if (eventType === "user.deleted") {
-    await knock.users.delete(evt.data.id || "");
-
-    await db.user.delete({
-      where: {
-        clerkId: evt.data.id,
-      },
-    });
+    await db.$transaction(async (ctx) => {
+      await knock.users.delete(evt.data.id || "");
+  
+      await db.user.delete({
+        where: {
+          clerkId: evt.data.id,
+        },
+      });
+    })
   }
 
   return new Response("", { status: 200 });

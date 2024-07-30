@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { Headset, LogOut, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { SignOutButton, useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 export function UserNav() {
   const {user} = useUser()
@@ -55,6 +56,18 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuSeparator />
+        <DropdownMenuItem className="hover:cursor-pointer" asChild>
+          <Link href={"/dashboard/profile"} className="flex items-center gap-x-3">
+            <User className="w-5 h-5 text-muted-foreground" />
+            Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="hover:cursor-pointer" asChild>
+          <Link href={"/dashboard/support"} className="flex items-center gap-x-3">
+            <Headset className="w-5 h-5 text-muted-foreground" />
+            Support
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem className="hover:cursor-pointer" asChild>
           <SignOutButton redirectUrl="/">
             <div>

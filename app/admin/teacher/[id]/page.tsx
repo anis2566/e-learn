@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
 import { ContentLayout } from "@/components/admin/content-layout"
 import { ListBox } from "@/components/list-box";
+import { Activity } from "./_components/activitiy";
 
 export const metadata: Metadata = {
     title: "E-Learn | Teacher Details",
@@ -36,6 +37,38 @@ const TeacherDetails = async ({ params: { id } }: Props) => {
         }
     })
     if (!teacher) redirect("/admin")
+
+    const questions = await db.question.findMany({
+        where: {
+            course: {
+                teachers: {
+                    some: {
+                        teacherId: id
+                    }
+                },
+            },
+            replies: {
+                some: {
+                    teacherId: id
+                }
+            }
+        },
+        include: {
+            replies: {
+                where: {
+                    teacherId: id
+                },
+                include: {
+                    teacher: true
+                }
+            },
+            user: true
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        take: 3
+    })
 
     return (
         <ContentLayout title="Category">
@@ -92,12 +125,7 @@ const TeacherDetails = async ({ params: { id } }: Props) => {
                             <ListBox icon={GitPullRequest} title="experience" description={teacher.experience?.toString() + " Years" || ""} />
                         </CardContent>
                     </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Recent Activity</CardTitle>
-                        </CardHeader>
-                        <CardContent>Activity</CardContent>
-                    </Card>
+                    <Activity questions={questions} />
                 </div>
             </div>
         </ContentLayout>

@@ -47,7 +47,7 @@ export function Sidebar() {
                   : "translate-x-0 opacity-100"
               )}
             >
-              APBN Scouts
+              E-Learn
             </h1>
           </Link>
         </Button>
