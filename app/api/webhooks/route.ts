@@ -70,13 +70,13 @@ export async function POST(req: Request) {
         },
       });
 
-      await clerkClient.users.updateUserMetadata(user.id, {
+      await clerkClient.users.updateUserMetadata(evt.data.id, {
         publicMetadata: {
           role: user.role,
         },
       });
 
-      await knock.users.identify(evt.data.id, {
+      await knock.users.identify(user.id, {
         name: user.name,
         avatar: user.imageUrl,
       });
