@@ -83,7 +83,7 @@ model CourseTeacher {
   courseId  String   @db.ObjectId
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  @@unique([teacherId, courseId, id])
+  @@unique([teacherId, courseId])
 }
 
 model Course {
