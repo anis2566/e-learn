@@ -1,15 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -25,205 +19,203 @@ enum Status {
   Suspended
 }
 
-
 model User {
-  id String @id @default(uuid())
-  clerkId String @unique
-  name String
-  email String
-  imageUrl String
-  role Role @default(User)
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId         String         @unique
+  name            String
+  email           String
+  imageUrl        String
+  role            Role           @default(User)
 
-  questions Question[]
-  purchases Purchase[]
-  teacher Teacher?
+  questions       Question[]
+  purchases       Purchase[]
+  teacher         Teacher?
   questionReplies QuestionReply[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@index([id, clerkId])
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([clerkId, id])
 }
 
 model Teacher {
-  id String @id @default(uuid())
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
-  email String
-  phone String
-  imageUrl String
-  bio String @db.Text
-  experience Int? 
-  status Status @default(Pending)
+  name            String
+  email           String
+  phone           String
+  imageUrl        String
+  bio             String
+  experience      Int?
+  status          Status         @default(Pending)
 
-  userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String         @unique @db.ObjectId
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  courses CourseTeacher[]
+  courses         CourseTeacher[]
   questionReplies QuestionReply[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
-  @@index([id, userId])
+  @@index([userId, id])
 }
 
 model Category {
-  id String @id @default(uuid())
-  name String
-  description String? @db.Text
-  imageUrl String
-  tags String[] @default([])
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  imageUrl    String
+  tags        String[] @default([])
 
-  courses Course[]
+  courses     Course[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model CourseTeacher {
-  teacherId String
-  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
 
-  courseId String
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  teacherId String   @db.ObjectId
+  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
-  @@id([teacherId, courseId])
+  courseId  String   @db.ObjectId
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, courseId, id])
 }
 
 model Course {
-  id String @id @default(uuid())
-  title String @db.Text
-  description String? @db.Text
-  imageUrl String? @db.Text
-  price Float?
-  isPublished Boolean @default(false)
-  tags String[] @default([])
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  imageUrl    String?
+  price       Float?
+  isPublished Boolean  @default(false)
+  tags        String[] @default([])
 
-  categoryId String?
-  category Category? @relation(fields: [categoryId], references: [id])
+  categoryId  String?  @db.ObjectId
+  category    Category? @relation(fields: [categoryId], references: [id])
 
-  chapters Chapter[]
-  purchases Purchase[]
-  questions Question[]
-  teachers CourseTeacher[]
+  chapters    Chapter[]
+  purchases   Purchase[]
+  questions   Question[]
+  teachers    CourseTeacher[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([id, categoryId])
+  @@index([categoryId])
 }
 
 model Chapter {
-  id String @id @default(uuid())
-  title String
-  description String? @db.Text
-  videoUrl String? @db.Text
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  title         String
+  description   String?
+  videoUrl      String?
   videoThumbnail String?
-  videoLength Int?
-  videoPlayer String?
-  position Int?
-  isPublished Boolean @default(false)
-  isFree Boolean @default(false)
+  videoLength   Int?
+  videoPlayer   String?
+  position      Int?
+  isPublished   Boolean        @default(false)
+  isFree        Boolean        @default(false)
 
-  courseId String
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId      String         @db.ObjectId
+  course        Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  userProgress UserProgress[]
-  attachments Attachment[]
-  questions Question[]
+  userProgress  UserProgress[]
+  attachments   Attachment[]
+  questions     Question[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
-  @@index([courseId, id])
+  @@index([courseId])
 }
 
 model Attachment {
-  id String @id @default(uuid())
-  title String
-  url String @db.Text
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  url         String
 
-  chapterId String
-  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId   String   @db.ObjectId
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@index([chapterId, id])
+  @@index([chapterId])
 }
 
 model UserProgress {
-  id String @id @default(uuid())
-  userId String
-  
-  chapterId String
-  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
 
-  isCompleted Boolean @default(false)
+  chapterId   String   @db.ObjectId
+  chapter     Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  isCompleted Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, chapterId])
+  @@index([chapterId])
+}
+
+model Purchase {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  courseId  String   @db.ObjectId
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([chapterId, id])
-  @@unique([userId, chapterId])
-}
-
-
-model Purchase {
-  id String @id @default(uuid())
-
-  courseId String
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt()
-
   @@unique([userId, courseId])
-  @@index([courseId, id, userId])
+  @@index([courseId, userId])
 }
-
 
 model Question {
-  id         String   @id @default(uuid())
-  title String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
 
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  courseId String
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId  String   @db.ObjectId
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  chapterId  String
-  chapter    Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  chapterId String   @db.ObjectId
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
-  replies QuestionReply[]
+  replies   QuestionReply[]
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([chapterId, id, userId, courseId])
+  @@index([chapterId, userId, courseId])
 }
 
-
 model QuestionReply {
-  id        String   @id @default(uuid())
-  reply      String @db.Text
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  reply      String
 
-  teacherId String?
-  teacher Teacher? @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  teacherId  String?  @db.ObjectId
+  teacher    Teacher? @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
-  userId String?
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String?  @db.ObjectId
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  questionId String
+  questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  @@index([questionId, id])
+  @@index([questionId])
 }
