@@ -70,7 +70,7 @@ export async function POST(req: Request) {
         },
       });
 
-      await clerkClient.users.updateUserMetadata(evt.data.id, {
+      await clerkClient.users.updateUserMetadata(user.id, {
         publicMetadata: {
           role: user.role,
         },
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
           role: (evt.data.public_metadata?.role as Role) || Role.User,
         },
       });
-      await knock.users.identify(evt.data.id, {
+      await knock.users.identify(user.id, {
         name: user.name,
         avatar: user.imageUrl,
       });
@@ -105,14 +105,20 @@ export async function POST(req: Request) {
 
   if (eventType === "user.deleted") {
     await db.$transaction(async (ctx) => {
-      await knock.users.delete(evt.data.id || "");
-  
+      const user = await ctx.user.findUnique({
+        where: {
+          clerkId: evt.data.id,
+        },
+      });
+
+      await knock.users.delete(user?.id || "");
+
       await db.user.delete({
         where: {
           clerkId: evt.data.id,
         },
       });
-    })
+    });
   }
 
   return new Response("", { status: 200 });
