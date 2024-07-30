@@ -4,6 +4,7 @@ import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { Knock } from "@knocklabs/node";
 import { Role } from "@prisma/client";
+import { fetchToken } from "@/lib/firebase";
 const knock = new Knock(process.env.NEXT_PUBLIC_KNOCK_API_KEY);
 
 export async function POST(req: Request) {
@@ -119,6 +120,15 @@ export async function POST(req: Request) {
         },
       });
     });
+  }
+
+  if(eventType === "session.created") {
+    const token = await fetchToken()
+    await clerkClient.users.updateUser(evt.data.id, {
+      privateMetadata: {
+        fcmToken: token
+      }
+    })
   }
 
   return new Response("", { status: 200 });
