@@ -124,7 +124,7 @@ export async function POST(req: Request) {
 
   if(eventType === "session.created") {
     const token = await fetchToken()
-    await clerkClient.users.updateUser(evt.data.id, {
+    await clerkClient.users.updateUser(evt.data.user_id, {
       privateMetadata: {
         fcmToken: token
       }
